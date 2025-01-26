@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PDF Upload</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2rem; }
+    form { display: flex; flex-direction: column; gap: 1rem; max-width: 300px; }
+    button { padding: 0.5rem 1rem; background-color: #007BFF; color: white; border: none; border-radius: 5px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+  </style>
+</head>
+<body>
+  <h1>Upload PDF</h1>
+  <form id="uploadForm">
+    <input type="file" id="pdfInput" accept="application/pdf" required>
+    <button type="submit">Upload</button>
+  </form>
+  <p id="responseMessage"></p>
+  <script>
+    const form = document.getElementById('uploadForm');
+    const pdfInput = document.getElementById('pdfInput');
+    const responseMessage = document.getElementById('responseMessage');
+
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      if (!pdfInput.files[0]) {
+        responseMessage.textContent = 'Please select a PDF.';
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('pdf', pdfInput.files[0]);
+
+      try {
+        const res = await fetch('/.netlify/functions/upload', {
+          method: 'POST',
+          body: formData,
+        });
+        const result = await res.json();
+        responseMessage.textContent = result.message;
+      } catch (error) {
+        responseMessage.textContent = 'Error uploading the file.';
+      }
+    });
+  </script>
+</body>
+</html>
